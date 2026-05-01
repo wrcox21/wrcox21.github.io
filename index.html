@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Name — Photography</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --white: #fafaf8;
+    --ink: #1a1a18;
+    --muted: #8a8a85;
+    --border: #e2e0da;
+    --accent: #1a1a18;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Jost', sans-serif;
+    font-weight: 300;
+    background: var(--white);
+    color: var(--ink);
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  .cursor {
+    width: 8px; height: 8px;
+    background: var(--ink);
+    border-radius: 50%;
+    position: fixed;
+    top: 0; left: 0;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.15s ease, width 0.2s ease, height 0.2s ease;
+    transform: translate(-50%, -50%);
+  }
+  .cursor.hover {
+    width: 40px; height: 40px;
+    background: transparent;
+    border: 1px solid var(--ink);
+  }
+
+  /* Page load fade */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .fade-up {
+    opacity: 0;
+    animation: fadeUp 0.9s ease forwards;
+  }
+  .delay-1 { animation-delay: 0.1s; }
+  .delay-2 { animation-delay: 0.25s; }
+  .delay-3 { animation-delay: 0.4s; }
+  .delay-4 { animation-delay: 0.55s; }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.75rem 2.5rem;
+    background: rgba(250,250,248,0.92);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.3s;
+  }
+  nav.scrolled { border-bottom-color: var(--border); }
+
+  .logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem;
+    font-weight: 300;
+    letter-spacing: 0.06em;
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 2.5rem;
+    list-style: none;
+  }
+  .nav-links a {
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--ink); }
+
+  /* HERO */
+  .hero {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 0 2.5rem 3rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background: #c8cfc0;
+    z-index: 0;
+  }
+
+  /* Placeholder image — replace with: background: url('your-hero.jpg') center/cover */
+  .hero-bg-img {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(to bottom, rgba(250,250,248,0) 40%, rgba(250,250,248,0.55) 100%),
+      #b8c0b0;
+    z-index: 1;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+
+  .hero-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    font-weight: 300;
+    line-height: 1.05;
+    color: var(--ink);
+  }
+  .hero-title em {
+    font-style: italic;
+    display: block;
+  }
+
+  .hero-meta {
+    text-align: right;
+    padding-bottom: 0.5rem;
+  }
+  .hero-location {
+    font-size: 0.65rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: block;
+    margin-bottom: 0.4rem;
+  }
+  .hero-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem;
+    color: var(--muted);
+  }
+
+  .scroll-hint {
+    position: absolute;
+    bottom: 3rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--muted);
+    font-size: 0.6rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+  .scroll-line {
+    width: 1px;
+    height: 48px;
+    background: var(--muted);
+    animation: scrollPulse 2s ease infinite;
+  }
+  @keyframes scrollPulse {
+    0%, 100% { opacity: 0.3; transform: scaleY(1); }
+    50% { opacity: 0.8; transform: scaleY(0.6); }
+  }
+
+  /* SECTION HEADER */
+  .section-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 4rem 2.5rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 0;
+  }
+  .section-label h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.5rem;
+    font-weight: 300;
+    font-style: italic;
+  }
+  .section-label span {
+    font-size: 0.65rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* GALLERY — full bleed scroll */
+  .gallery {
+    padding: 0;
+  }
+
+  .gallery-item {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-bottom: 1px solid var(--border);
+    min-height: 70vh;
+    overflow: hidden;
+  }
+  .gallery-item.reverse { direction: rtl; }
+  .gallery-item.reverse > * { direction: ltr; }
+
+  .gallery-img {
+    position: relative;
+    overflow: hidden;
+    /* Replace background with: background: url('photo.jpg') center/cover no-repeat; */
+  }
+  .gallery-img-1 { background: #8a9882; }
+  .gallery-img-2 { background: #6b7d8a; }
+  .gallery-img-3 { background: #9a8a70; }
+  .gallery-img-4 { background: #7a8870; }
+
+  .gallery-img::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(26,26,24,0);
+    transition: background 0.5s ease;
+  }
+  .gallery-item:hover .gallery-img::after {
+    background: rgba(26,26,24,0.08);
+  }
+
+  /* placeholder svg overlay */
+  .img-label {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(250,250,248,0.5);
+    pointer-events: none;
+  }
+
+  .gallery-info {
+    padding: 3rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: var(--white);
+  }
+
+  .gallery-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-bottom: 1.5rem;
+    display: block;
+  }
+
+  .gallery-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.8rem, 3vw, 2.8rem);
+    font-weight: 300;
+    line-height: 1.15;
+    margin-bottom: 1.25rem;
+  }
+  .gallery-title em { font-style: italic; }
+
+  .gallery-desc {
+    font-size: 0.8rem;
+    line-height: 1.85;
+    color: var(--muted);
+    max-width: 38ch;
+    margin-bottom: 2rem;
+  }
+
+  .gallery-meta {
+    display: flex;
+    gap: 2rem;
+  }
+  .meta-item { }
+  .meta-key {
+    font-size: 0.58rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+  .meta-val {
+    font-size: 0.8rem;
+    color: var(--ink);
+  }
+
+  /* MASONRY STRIP */
+  .strip-label {
+    padding: 4rem 2.5rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .strip-label h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.5rem;
+    font-weight: 300;
+    font-style: italic;
+  }
+  .view-all {
+    font-size: 0.65rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink);
+    text-decoration: none;
+    border-bottom: 1px solid var(--ink);
+    padding-bottom: 1px;
+    transition: color 0.2s;
+  }
+  .view-all:hover { color: var(--muted); border-color: var(--muted); }
+
+  .strip {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    border-bottom: 1px solid var(--border);
+  }
+  .strip-item {
+    aspect-ratio: 3/4;
+    position: relative;
+    overflow: hidden;
+    border-right: 1px solid var(--border);
+    cursor: pointer;
+  }
+  .strip-item:last-child { border-right: none; }
+  .strip-item:nth-child(1) { background: #9aa88e; }
+  .strip-item:nth-child(2) { background: #7a8c8a; aspect-ratio: 3/5; align-self: end; }
+  .strip-item:nth-child(3) { background: #a89878; }
+  .strip-item:nth-child(4) { background: #889878; aspect-ratio: 3/5; align-self: end; }
+  .strip-item:nth-child(5) { background: #7a889a; }
+
+  .strip-item::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(26,26,24,0);
+    transition: background 0.4s;
+  }
+  .strip-item:hover::after { background: rgba(26,26,24,0.12); }
+
+  /* ABOUT */
+  .about {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-bottom: 1px solid var(--border);
+    min-height: 50vh;
+  }
+  .about-text {
+    padding: 5rem 3rem 5rem 2.5rem;
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .about-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 1.5rem;
+    display: block;
+  }
+  .about-heading {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.6rem, 3vw, 2.5rem);
+    font-weight: 300;
+    line-height: 1.2;
+    margin-bottom: 1.5rem;
+  }
+  .about-heading em { font-style: italic; }
+  .about-body {
+    font-size: 0.82rem;
+    line-height: 1.9;
+    color: var(--muted);
+    max-width: 44ch;
+    margin-bottom: 2rem;
+  }
+  .about-disciplines {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  .discipline {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.72rem;
+    color: var(--ink);
+  }
+  .discipline::before {
+    content: '';
+    display: block;
+    width: 20px;
+    height: 1px;
+    background: var(--muted);
+    flex-shrink: 0;
+  }
+
+  .about-portrait {
+    background: #a0a898;
+    position: relative;
+    overflow: hidden;
+    min-height: 400px;
+  }
+  .about-portrait .img-label {
+    color: rgba(250,250,248,0.4);
+  }
+
+  /* CONTACT */
+  .contact {
+    padding: 6rem 2.5rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .contact-left {}
+  .contact-pre {
+    font-size: 0.65rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 1.5rem;
+    display: block;
+  }
+  .contact-heading {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    font-weight: 300;
+    line-height: 1.1;
+    margin-bottom: 2rem;
+  }
+  .contact-heading em { font-style: italic; }
+
+  .contact-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink);
+    text-decoration: none;
+    border-bottom: 1px solid var(--ink);
+    padding-bottom: 2px;
+    transition: color 0.2s;
+  }
+  .contact-link:hover { color: var(--muted); border-color: var(--muted); }
+
+  .contact-right {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 2rem;
+  }
+  .contact-detail {
+    border-top: 1px solid var(--border);
+    padding-top: 1rem;
+  }
+  .contact-detail-label {
+    font-size: 0.6rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: block;
+    margin-bottom: 0.4rem;
+  }
+  .contact-detail-val {
+    font-size: 0.85rem;
+    color: var(--ink);
+  }
+
+  /* FOOTER */
+  footer {
+    padding: 1.5rem 2.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .footer-copy {
+    font-size: 0.65rem;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+  }
+  .footer-links {
+    display: flex;
+    gap: 1.5rem;
+    list-style: none;
+  }
+  .footer-links a {
+    font-size: 0.65rem;
+    color: var(--muted);
+    text-decoration: none;
+    letter-spacing: 0.1em;
+    transition: color 0.2s;
+  }
+  .footer-links a:hover { color: var(--ink); }
+
+  /* Scroll reveal */
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="#" class="logo fade-up delay-1">Your Name</a>
+  <ul class="nav-links fade-up delay-2">
+    <li><a href="#work">Work</a></li>
+    <li><a href="#recent">Recent</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <!-- Replace the div below's background with: background: url('your-hero-photo.jpg') center/cover no-repeat -->
+  <div class="hero-bg-img"></div>
+
+  <div class="hero-content fade-up delay-3">
+    <h1 class="hero-title">
+      Documenting<br>
+      <em>the unseen world</em>
+    </h1>
+    <div class="hero-meta">
+      <span class="hero-location">Nature &amp; documentary</span>
+      <span class="hero-num">Est. 2016</span>
+    </div>
+  </div>
+
+  <div class="scroll-hint fade-up delay-4">
+    <div class="scroll-line"></div>
+    <span>Scroll</span>
+  </div>
+</section>
+
+<!-- WORK -->
+<section id="work">
+  <div class="section-label reveal">
+    <h2>Selected work</h2>
+    <span>2022 — 2024</span>
+  </div>
+
+  <div class="gallery">
+
+    <!-- Item 1 -->
+    <div class="gallery-item reveal">
+      <!-- Replace class gallery-img-1 background color with your photo -->
+      <div class="gallery-img gallery-img-1">
+        <span class="img-label">Replace with your photo</span>
+      </div>
+      <div class="gallery-info">
+        <span class="gallery-num">01 / 04</span>
+        <h3 class="gallery-title">Old growth,<br><em>first light</em></h3>
+        <p class="gallery-desc">Spent three weeks embedded in the Hoh Rainforest tracing the morning light through 500-year-old Sitka spruce. These are the photographs that resulted.</p>
+        <div class="gallery-meta">
+          <div class="meta-item">
+            <span class="meta-key">Location</span>
+            <span class="meta-val">Olympic NP, WA</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-key">Year</span>
+            <span class="meta-val">2024</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-key">Series</span>
+            <span class="meta-val">12 images</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Item 2 (reversed) -->
+    <div class="gallery-item reverse reveal">
+      <div class="gallery-img gallery-img-2">
+        <span class="img-label">Replace with your photo</span>
+      </div>
+      <div class="gallery-info">
+        <span class="gallery-num">02 / 04</span>
+        <h3 class="gallery-title">Shore birds<br><em>at dusk</em></h3>
+        <p class="gallery-desc">The estuary at low tide becomes something else entirely — a mirror, a stage, a runway for thousands of migrating birds passing through.</p>
+        <div class="gallery-meta">
+          <div class="meta-item">
+            <span class="meta-key">Location</span>
+            <span class="meta-val">Morro Bay, CA</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-key">Year</span>
+            <span class="meta-val">2023</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-key">Series</span>
+            <span class="meta-val">18 images</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Item 3 -->
+    <div class="gallery-item reveal">
+      <div class="gallery-img gallery-img-3">
+        <span class="img-label">Replace with your photo</span>
+      </div>
+      <div class="gallery-info">
+        <span class="gallery-num">03 / 04</span>
+        <h3 class="gallery-title">Desert bloom,<br><em>Sonoran spring</em></h3>
+        <p class="gallery-desc">After the wettest winter in a decade, the Sonoran desert erupted with color. A two-week window that only comes once every several years.</p>
+        <div class="gallery-meta">
+          <div class="meta-item">
+            <span class="meta-key">Location</span>
+            <span class="meta-val">Arizona, USA</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-key">Year</span>
+            <span class="meta-val">2023</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-key">Series</span>
+            <span class="meta-val">24 images</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Item 4 (reversed) -->
+    <div class="gallery-item reverse reveal">
+      <div class="gallery-img gallery-img-4">
+        <span class="img-label">Replace with your photo</span>
+      </div>
+      <div class="gallery-info">
+        <span class="gallery-num">04 / 04</span>
+        <h3 class="gallery-title">The long<br><em>migration</em></h3>
+        <p class="gallery-desc">Following the monarch butterfly migration from the Sierra Nevada foothills to its overwintering grounds in the mountains of Michoacán.</p>
+        <div class="gallery-meta">
+          <div class="meta-item">
+            <span class="meta-key">Location</span>
+            <span class="meta-val">California / Mexico</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-key">Year</span>
+            <span class="meta-val">2022</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-key">Series</span>
+            <span class="meta-val">30 images</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- RECENT STRIP -->
+<section id="recent">
+  <div class="strip-label reveal">
+    <h2>Recent frames</h2>
+    <a href="#" class="view-all">View all</a>
+  </div>
+  <div class="strip reveal">
+    <!-- Replace backgrounds with: background: url('photo.jpg') center/cover -->
+    <div class="strip-item"></div>
+    <div class="strip-item"></div>
+    <div class="strip-item"></div>
+    <div class="strip-item"></div>
+    <div class="strip-item"></div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about" class="about">
+  <div class="about-text reveal">
+    <span class="about-label">The photographer</span>
+    <h2 class="about-heading">Patient observer,<br><em>field naturalist</em></h2>
+    <p class="about-body">I make photographs in wild places — sometimes waiting hours, sometimes returning for years, always looking for the quiet truth of a moment rather than the spectacle of it. Based in the American Southwest, working worldwide.</p>
+    <div class="about-disciplines">
+      <span class="discipline">Landscape & wilderness</span>
+      <span class="discipline">Wildlife & migration</span>
+      <span class="discipline">Long-form documentary</span>
+      <span class="discipline">Editorial & print</span>
+    </div>
+  </div>
+  <!-- Replace background with: background: url('portrait.jpg') center/cover no-repeat -->
+  <div class="about-portrait">
+    <span class="img-label">Replace with your portrait</span>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact" class="contact">
+  <div class="contact-left reveal">
+    <span class="contact-pre">Get in touch</span>
+    <h2 class="contact-heading">Let's make<br><em>something</em><br>together</h2>
+    <a href="mailto:hello@yoursite.com" class="contact-link">hello@yoursite.com →</a>
+  </div>
+  <div class="contact-right reveal">
+    <div class="contact-detail">
+      <span class="contact-detail-label">Based in</span>
+      <span class="contact-detail-val">Phoenix, Arizona — USA</span>
+    </div>
+    <div class="contact-detail">
+      <span class="contact-detail-label">Available for</span>
+      <span class="contact-detail-val">Editorial, commercial, licensing</span>
+    </div>
+    <div class="contact-detail">
+      <span class="contact-detail-label">Response time</span>
+      <span class="contact-detail-val">Within 48 hours</span>
+    </div>
+    <div class="contact-detail">
+      <span class="contact-detail-label">Instagram</span>
+      <span class="contact-detail-val"><a href="#" style="color:inherit;text-decoration:none;border-bottom:1px solid var(--border);">@yourhandle</a></span>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span class="footer-copy">© 2026 Your Name. All rights reserved.</span>
+  <ul class="footer-links">
+    <li><a href="#">Instagram</a></li>
+    <li><a href="#">Licensing</a></li>
+    <li><a href="#">Privacy</a></li>
+  </ul>
+</footer>
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  document.addEventListener('mousemove', e => {
+    cursor.style.left = e.clientX + 'px';
+    cursor.style.top = e.clientY + 'px';
+  });
+  document.querySelectorAll('a, button, .gallery-item, .strip-item').forEach(el => {
+    el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+    el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+  });
+
+  // Nav scroll state
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 60);
+  });
+
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
