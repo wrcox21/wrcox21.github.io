@@ -100,21 +100,37 @@
     padding: 2rem 2rem 6rem;
   }
   .grid {
-    columns: 3;
-    column-gap: 1.1rem;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.1rem;
   }
-  @media (max-width: 900px) { .grid { columns: 2; } }
-  @media (max-width: 560px) { .grid { columns: 1; } }
+  @media (max-width: 900px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 560px) { .grid { grid-template-columns: 1fr; } }
+
+  .cat-section { margin-bottom: 3.5rem; }
+  .cat-label {
+    font-family: "Spline Sans Mono", monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.7rem;
+    color: var(--muted);
+    padding-bottom: 0.9rem;
+    margin-bottom: 1.4rem;
+    border-bottom: 1px solid var(--line);
+  }
 
   figure {
-    break-inside: avoid;
-    margin-bottom: 1.1rem;
+    margin: 0;
     position: relative;
     overflow: hidden;
     background: #ebe9e3;
+    aspect-ratio: 4/3;
+    cursor: pointer;
   }
   figure img {
     width: 100%;
+    height: 100%;
+    object-fit: cover;
     display: block;
     transition: transform 0.7s cubic-bezier(0.2,0.8,0.2,1);
   }
@@ -128,11 +144,40 @@
     background: linear-gradient(transparent, rgba(0,0,0,0.55));
     opacity: 0;
     transition: opacity 0.35s ease;
+    pointer-events: none;
   }
   figure:hover figcaption { opacity: 1; }
 
-  /* placeholder tiles so the layout is visible before you add photos */
-  .ph { aspect-ratio: var(--ar, 3/4); display: grid; place-items: center; color: var(--muted); }
+  /* ---------- Lightbox ---------- */
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    background: rgba(20,19,17,0.94);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    cursor: zoom-out;
+  }
+  .lightbox.open { display: flex; }
+  .lightbox img {
+    max-width: 95vw;
+    max-height: 92vh;
+    object-fit: contain;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+  .lightbox .close {
+    position: absolute;
+    top: 1.4rem; right: 1.6rem;
+    color: #fff;
+    font-family: "Spline Sans Mono", monospace;
+    font-size: 1.4rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    line-height: 1;
+  }
 
   /* ---------- About / Contact ---------- */
   .strip {
@@ -175,37 +220,6 @@
   footer a { color: var(--muted); text-decoration: none; }
   footer a:hover { color: var(--ink); }
 
-  /* ---------- Filter tabs ---------- */
-  .filters {
-    max-width: var(--max);
-    margin: 0 auto;
-    padding: 0 2rem;
-    display: flex;
-    gap: 0.4rem;
-    flex-wrap: wrap;
-  }
-  .filters button {
-    font-family: "Spline Sans Mono", monospace;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    font-size: 0.7rem;
-    color: var(--muted);
-    background: none;
-    border: 1px solid transparent;
-    padding: 0.5rem 0.95rem;
-    cursor: pointer;
-    border-radius: 999px;
-    transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease;
-  }
-  .filters button:hover { color: var(--ink); }
-  .filters button.active {
-    color: var(--bg);
-    background: var(--ink);
-    border-color: var(--ink);
-  }
-
-  figure.hidden { display: none; }
-
   /* load-in */
   .fade { opacity: 0; transform: translateY(14px); animation: rise 0.9s forwards; }
   @keyframes rise { to { opacity: 1; transform: none; } }
@@ -230,32 +244,42 @@
 </section>
 
 <section class="gallery" id="work">
-  <div class="filters mono" id="filters">
-    <button class="active" data-filter="all">All</button>
-    <button data-filter="nature">Nature</button>
-    <button data-filter="documentary">Documentary</button>
-    <button data-filter="sports">Sports</button>
+  <!--
+    TO ADD A PHOTO: add a <figure> inside the right .grid below:
+    <figure><img src="images/your-photo.jpg"><figcaption class="mono">Title — Location, Year</figcaption></figure>
+  -->
+  <div class="cat-section">
+    <div class="cat-label">Nature</div>
+    <div class="grid">
+      <figure><img src="images/nature-1.jpg"><figcaption class="mono">Title — Location, Year</figcaption></figure>
+      <figure><img src="images/nature-2.jpg"><figcaption class="mono">Title — Location, Year</figcaption></figure>
+      <figure><img src="images/nature-3.jpg"><figcaption class="mono">Title — Location, Year</figcaption></figure>
+    </div>
   </div>
-  <div class="grid" style="margin-top:2rem;" id="grid">
-    <!--
-      TO ADD A PHOTO: replace a placeholder <figure> below with:
-      <figure data-cat="nature">
-        <img src="images/your-photo.jpg" alt="Short description">
-        <figcaption class="mono">Title — Location, Year</figcaption>
-      </figure>
-      The data-cat value must be one of: nature, documentary, sports
-    -->
-    <figure data-cat="nature"><img src="images/nature-1.jpg" alt="Nature photograph"><figcaption class="mono">Title — Location, Year</figcaption></figure>
-    <figure data-cat="documentary"><img src="images/documentary-1.jpg" alt="Documentary photograph"><figcaption class="mono">Title — Location, Year</figcaption></figure>
-    <figure data-cat="sports"><img src="images/sports-1.jpg" alt="Sports photograph"><figcaption class="mono">Title — Location, Year</figcaption></figure>
-    <figure data-cat="nature"><img src="images/nature-2.jpg" alt="Nature photograph"><figcaption class="mono">Title — Location, Year</figcaption></figure>
-    <figure data-cat="sports"><img src="images/sports-2.jpg" alt="Sports photograph"><figcaption class="mono">Title — Location, Year</figcaption></figure>
-    <figure data-cat="documentary"><img src="images/documentary-2.jpg" alt="Documentary photograph"><figcaption class="mono">Title — Location, Year</figcaption></figure>
-    <figure data-cat="nature"><img src="images/nature-3.jpg" alt="Nature photograph"><figcaption class="mono">Title — Location, Year</figcaption></figure>
-    <figure data-cat="documentary"><img src="images/documentary-3.jpg" alt="Documentary photograph"><figcaption class="mono">Title — Location, Year</figcaption></figure>
-    <figure data-cat="sports"><img src="images/sports-3.jpg" alt="Sports photograph"><figcaption class="mono">Title — Location, Year</figcaption></figure>
+
+  <div class="cat-section">
+    <div class="cat-label">Documentary</div>
+    <div class="grid">
+      <figure><img src="images/documentary-1.jpg"><figcaption class="mono">Title — Location, Year</figcaption></figure>
+      <figure><img src="images/documentary-2.jpg"><figcaption class="mono">Title — Location, Year</figcaption></figure>
+      <figure><img src="images/documentary-3.jpg"><figcaption class="mono">Title — Location, Year</figcaption></figure>
+    </div>
+  </div>
+
+  <div class="cat-section">
+    <div class="cat-label">Sports</div>
+    <div class="grid">
+      <figure><img src="images/sports-1.jpg"><figcaption class="mono">Title — Location, Year</figcaption></figure>
+      <figure><img src="images/sports-2.jpg"><figcaption class="mono">Title — Location, Year</figcaption></figure>
+      <figure><img src="images/sports-3.jpg"><figcaption class="mono">Title — Location, Year</figcaption></figure>
+    </div>
   </div>
 </section>
+
+<div class="lightbox" id="lightbox">
+  <button class="close" id="lbClose" aria-label="Close">✕</button>
+  <img src="" alt="" id="lbImg">
+</div>
 
 <section class="strip" id="about">
   <div class="about">
@@ -268,24 +292,32 @@
 </section>
 
 <footer class="mono">
-  <span>© <span id="yr"></span> Billy C</span>
-  <span><a href="https://glass.photo/billy_c/">Glass.Photo</a></span>
+  <span>© <span id="yr"></span> Your Name</span>
+  <span><a href="https://instagram.com/">Instagram</a></span>
 </footer>
 
 <script>
   document.getElementById('yr').textContent = new Date().getFullYear();
 
-  const filters = document.getElementById('filters');
-  const figures = document.querySelectorAll('#grid figure');
-  filters.addEventListener('click', (e) => {
-    const btn = e.target.closest('button');
-    if (!btn) return;
-    filters.querySelector('.active').classList.remove('active');
-    btn.classList.add('active');
-    const cat = btn.dataset.filter;
-    figures.forEach(f => {
-      f.classList.toggle('hidden', cat !== 'all' && f.dataset.cat !== cat);
+  const lightbox = document.getElementById('lightbox');
+  const lbImg = document.getElementById('lbImg');
+  const lbClose = document.getElementById('lbClose');
+
+  document.querySelectorAll('#work figure img').forEach(img => {
+    img.addEventListener('click', () => {
+      lbImg.src = img.src;
+      lightbox.classList.add('open');
     });
+  });
+
+  function closeLightbox() {
+    lightbox.classList.remove('open');
+    lbImg.src = '';
+  }
+  lightbox.addEventListener('click', closeLightbox);
+  lbClose.addEventListener('click', closeLightbox);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeLightbox();
   });
 </script>
 
